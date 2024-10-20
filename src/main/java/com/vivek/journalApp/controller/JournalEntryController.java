@@ -12,14 +12,14 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/journal")
-public class JournalEntryControllerV2 {
+public class JournalEntryController {
 
     @Autowired
     private JournalEntryService journalEntryService;
 
-    @GetMapping
-    public ResponseEntity<List<JournalEntry>> getAll() {
-        List<JournalEntry> allEntries = journalEntryService.getAll();
+    @GetMapping("/{userName}")
+    public ResponseEntity<List<JournalEntry>> getAllEntriesByUser(@PathVariable String userName) {
+        List<JournalEntry> allEntries = journalEntryService.getAllEntriesByUserName(userName);
         if (allEntries != null) {
             return new ResponseEntity<>(allEntries, HttpStatus.OK);
         }
@@ -35,20 +35,19 @@ public class JournalEntryControllerV2 {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping
-    public ResponseEntity<JournalEntry> createEntry(@RequestBody JournalEntry journalEntry) {
-        journalEntry.setDate(LocalDateTime.now());
-        JournalEntry journalEntry1 = journalEntryService.saveEntry(journalEntry);
+    @PostMapping("/{userName}")
+    public ResponseEntity<JournalEntry> createEntry(@RequestBody JournalEntry journalEntry, @PathVariable String userName) {
+        JournalEntry journalEntry1 = journalEntryService.saveEntry(journalEntry, userName);
         if (journalEntry1 != null) {
             return new ResponseEntity<>(journalEntry1, HttpStatus.CREATED);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @DeleteMapping("id/{id}")
-    public ResponseEntity<?> deleteEntryById(@PathVariable String id) {
+    @DeleteMapping("/{userName}/{id}")
+    public ResponseEntity<?> deleteEntryById(@PathVariable String id, @PathVariable String userName) {
         try {
-            journalEntryService.deleteById(id);
+            journalEntryService.deleteById(userName, id);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
