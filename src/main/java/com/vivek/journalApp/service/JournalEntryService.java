@@ -5,6 +5,7 @@ import com.vivek.journalApp.entity.User;
 import com.vivek.journalApp.repository.JournalEntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,11 +29,13 @@ public class JournalEntryService {
         return journalEntryRepository.findById(id);
     }
 
+    @Transactional
     public JournalEntry saveEntry(JournalEntry journalEntry, String userName) {
         User savedUser = userService.findByUserName(userName);
         journalEntry.setDate(LocalDateTime.now());
         JournalEntry savedJournalEntry = journalEntryRepository.save(journalEntry);
         savedUser.getJournalEntries().add(savedJournalEntry);
+        savedUser.setUsername(null); // to check if transactional is working or not
         userService.saveUser(savedUser);
         return savedJournalEntry;
     }

@@ -28,6 +28,7 @@ public class User {
     private String password;
 
     @DBRef   // ref of object from journal entry -- act as foreign key
-    List<JournalEntry> journalEntries = new ArrayList<>();
+    private List<JournalEntry> journalEntries = new ArrayList<>();
 
+    private List<String> roles;
 }

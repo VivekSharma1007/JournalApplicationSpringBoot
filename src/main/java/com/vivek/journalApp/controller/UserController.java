@@ -6,6 +6,10 @@ import com.vivek.journalApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.config.annotation.web.configurers.SecurityContextConfigurer;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,34 +19,24 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    UserService userService;
+    private UserService userService;
 
-    @GetMapping
-    public ResponseEntity<List<User>> getUsers() {
-        List<User> users = userService.getAll();
-        if (!users.isEmpty()) {
-            return new ResponseEntity<>(users, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    @PostMapping
-    public ResponseEntity<?> saveUser(@RequestBody User user) {
-        try {
-            System.out.println(user.getUsername() + "," + user.getPassword());
-            userService.saveUser(user);
-        } catch(Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    @PutMapping("/update")
+    public ResponseEntity<?> updateUser(@RequestBody User user) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();  // security context
+        // holder will hold authentication details
+        String username = authentication.getName();
+        User afterSave = userService.updateUser(username, user);
+        if (afterSave == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-//    @PutMapping("/{userName}")
-//    public ResponseEntity<?> updateUser(@PathVariable String userName, @RequestBody User user) {
-//        User afterSave = userService.updateUser(userName, user);
-//        if(afterSave == null) {
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//        return new ResponseEntity<>(HttpStatus.ACCEPTED);
-//    }
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        userService.deleteByUsername(authentication.getName());
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
 }
