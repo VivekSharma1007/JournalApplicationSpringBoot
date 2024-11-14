@@ -35,11 +35,11 @@ public class JournalEntryService {
         journalEntry.setDate(LocalDateTime.now());
         JournalEntry savedJournalEntry = journalEntryRepository.save(journalEntry);
         savedUser.getJournalEntries().add(savedJournalEntry);
-        savedUser.setUsername(null); // to check if transactional is working or not
         userService.saveUser(savedUser);
         return savedJournalEntry;
     }
 
+    @Transactional
     public void deleteById(String userName, String id) {
         User user = userService.findByUserName(userName);
         user.getJournalEntries().removeIf(x -> x.getId().equals(id));

@@ -23,7 +23,7 @@ public class PublicController {
     public ResponseEntity<?> saveUser(@RequestBody User user) {
         try {
             System.out.println(user.getUsername() + "," + user.getPassword());
-            userService.saveUser(user);
+            userService.saveNewUser(user);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
