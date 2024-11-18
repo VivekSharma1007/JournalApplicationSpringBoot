@@ -45,4 +45,14 @@ public class UserService {
     public void deleteByUsername(String username) {
         userRepository.deleteByUsername(username);
     }
+
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
+    public User saveNewAdmin(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(List.of("USER", "ADMIN"));
+        return userRepository.save(user);
+    }
 }
